@@ -24,6 +24,7 @@ class Mesh:
         self.mesh = gl.GLMeshItem(vertexes=verts, faces=faces)
         self.mesh.setGLOptions("additive")
         self.view.addItem(self.mesh)
+        self.view.setWindowTitle('Meshy')
 
     def run(self):
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
