@@ -10,52 +10,35 @@ class Mesh:
         self.view.show() # shows the view widget
         self.view.setWindowTitle('Mesh') #sets the window title to whatever we want
 
-
-        # To make a 1024 grid, first create a 32 by 32 grid, and then create 10-24 faces
-            # try using a nested for loop? first for loop for the horizontal rows/vertices & second for loop for the vertical rows/vertices
-            # use an offset, everytime you move through it, you increase it (iteration / counter method)
-
-            # use a nested for loop in terms of x & y coordinates
-        vertices = []
+        vertices = [] # vertices is an np array of [x, y, z] coordinates
         for row in range(32): # row corresponds to the y value
             for col in range(32): # col corresponds to the x value
-                vertices.append((col, row))
+                vertices.append([col, row, 0])
 
-        faces = []
-            for n in range(32):
-                for i in range(n+1, 32):
-                    #for k in range(j+1, 32)
-                    faces.append((n, i))
+        faces = [] # faces is an np array of [vertex1, vertex2, vertex3] using indices from the vertices np array
+        for n in range(31): # row
+            for k in range(31): # column
+# first point of FIRST triangle; to the right of the first; directly below the first
+                faces.append([n * 32 + k, n * 32 + k + 1, (n + 1) * 32 + k ])
+# first point of SECOND triangle (same as last point of first triangle); to the right of the first; at the top (same as second position of first triangle)
+                faces.append([(n + 1) * 32 + k, (n + 1) * 32 + k + 1, n * 32 + k + 1])
+
+        colors = []
+        for i in range(341):
+            colors.append([1, 0, 0, 0.6])
+            colors.append([0, 1, 0, 0.6])
+            colors.append([0, 0, 1, 0.6])
+        colors.append([1, 0, 0, 0.6])
 
         v = np.array(vertices)
         f = np.array(faces)
-
-
-        #v = np.array([
-         #  [0, 0, 0],
-          # [2, 0, 0],
-           #[1, 2, 0],
-           #[1, 1, 1],
-        # ])
-
-        #f = np.array([
-         #  [0, 1, 2],
-          # [0, 1, 3],
-           #[0, 2, 3],
-           #[1, 2, 3],
-        #])
-
-        c = np.array([
-        [1,0,0,0.5],
-        [0,1,0,0.5],
-        [0,0,1,0.5]
-        ])
+        c = np.array(colors)
 
         self.mesh = gl.GLMeshItem(vertexes=v, faces=f, faceColors=c)
         self.mesh.setGLOptions("additive")
         self.view.addItem(self.mesh)
-        # vertexes is an np array of [x, y, z] coordinates
-        # faces is an np array of [vertex1, vertex2, vertex3] using indices from the vertexes np array
+        self.view.setWindowTitle('me$h')
+
 
     def run(self): # this function actually executes our Mesh instance and enables the GUI to run!
         if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
