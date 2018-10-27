@@ -32,7 +32,7 @@ class Mesh:
         verts = []
         for row in range(32):
             for col in range(32):
-                verts.append([row, col, 0])
+                verts.append([row, col,self.noise.noise2d(x= row, y=col)])
 
         #assigns triangular faces
         faces = []
@@ -53,37 +53,33 @@ class Mesh:
         faces = np.array(faces)
 
         colors = []
-        for i in range(1024):
-            colors.append([1, 0, 0, 1])
-            colors.append([0, 1, 0, 1])
-            colors.append([0, 0, 1, 1])
+        for i in range(341):
+            colors.append([1, 0, 0, 0.5])
+            colors.append([0, 1, 0, 0.5])
+            colors.append([0, 0, 1, 0.5])
+            colors.append([1, 0, 0, 0.5])
 
         colors = np.array(colors)
         self.mesh = gl.GLMeshItem(vertexes = verts, faces = faces, vertexColors = colors)
         self.mesh.setGLOptions("additive")
         self.view.addItem(self.mesh)
-        self.view.setWindowTitle('Mesh')
+        self.view.setWindowTitle('me$h')
 
 
-
-    def run(self):
-        if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
-            QtGui.QApplication.instance().exec_()
 
     def update(self):
         self.audioData = self.stream.read(self.CHUNK, exception_on_overflow = False)
-        self.audioData = struct.unpack(str(2 * self.CHUNK) + 'B', self.audioData)
-        self.audioData = np.array(self.audioData, dtype = 'b')[::2] + 128
-        self.audioData = np.array(self.audioData, dtype = 'int32') - 128
-        self.audioData = self.audioData * 0.04
-        self.audioData = self.audioData.reshape(32, 32)
+        a = struct.unpack(str(2 * self.CHUNK) + 'B', self.audioData)
+        a = np.array(a, dtype = 'b')[::2] + 128
+        a = np.array(a, dtype = 'int32') - 128
+        a = a * 0.04
+        a = a.reshape(32, 32)
 
         verts = []
         for row in range(32):
             for col in range(32):
                 verts.append([row, col,
-                 #self.audioData[row][col] *
-                  self.noise.noise2d(x= row + self.offSet, y= col + self.offSet)])
+                 a[row][col] * self.noise.noise2d(x= row + self.offSet, y= col + self.offSet)])
 
         faces = []
         for i in range(31): #row
@@ -98,20 +94,22 @@ class Mesh:
                 (i + 1) * 32 + j + 1, #point to the right of the first
                 i * 32 + j + 1 #point at the top of the second triangle (same as 2nd position of first)
                 ])
+
+        colors = []
+        for i in range(341):
+            colors.append([1, 0, 0, 0.5])
+            colors.append([0, 1, 0, 0.5])
+            colors.append([0, 0, 1, 0.5])
+            colors.append([1, 0, 0, 0.5])
+
         verts = np.array(verts)
         faces = np.array(faces)
-        colors = []
-        for i in range(1024):
-            colors.append([1, 0, 0, 1])
-            colors.append([0, 1, 0, 1])
-            colors.append([0, 0, 1, 1])
-
         colors = np.array(colors)
 
-        self.mesh.setMeshData(vertexes = verts, faces = faces, vertexColors = colors, drawEdges = True)
+        self.mesh.setMeshData(vertexes = verts, faces = faces, faceColors = colors, drawEdges = True)
         self.offSet -= 0.01
 
-        print(self.audioData)
+        print(a)
 
 
 
@@ -121,6 +119,10 @@ class Mesh:
         timer.start(10)
         self.run()
         self.update()
+
+    def run(self):
+        if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
+            QtGui.QApplication.instance().exec_()
 
 
 
